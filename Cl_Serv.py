@@ -1,5 +1,9 @@
 import socket
 from tkinter import *
+import json
+
+weird_json = {"x0": 1, "x1": 2, "x2": 3, "mass": [0, 1, 2, 3]}
+send = json.dumps(weird_json)
 
 tk=Tk()
 
@@ -67,17 +71,26 @@ def sendproc(event):
        try:
             s = socket.socket()
             s.settimeout(2)
+
+            sData = name.get() + ':' + text.get() #должно стоять в пробеле ниже, добавил сюда чтоб можно было проверить и записать этот коммит для исправления в дальнейшем
+
             s.connect(addr[i])
             s.settimeout(None)
-            sData = name.get()+':'+text.get()
-            s.send(sData.encode("utf-8"))#тут меняем ip-шники
+
+            s.sendto(send.encode(), addr[i])  # тут меняем ip-шники  sData.encode("utf-8")
             log.insert(END, sData + '\n')
             text.set('')
             s.close()
             break
        except:
-           print("error %s - is not available" % i)
-
+            WtF += 1
+            s.close()
+            print("error %s - is not available" % i)
+    if (WtF == addrL):
+        print("in file")
+        f = open('data.txt', 'w')
+        f.write(sData + '\n')
+        f.close()   
 
 
 msg.bind('<Return>',sendproc)
